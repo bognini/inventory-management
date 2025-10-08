@@ -3,12 +3,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.contrib.auth import logout as auth_logout
 import csv
 from datetime import datetime
 from xhtml2pdf import pisa
 from io import BytesIO
 from .models import Article, MouvementStock, Famille, TypeProduit, Fabricant, ModeleProduit, Emplacement, Fournisseur, Client, Projet, Entrepot
 from .forms import ArticleForm, EntreeForm, SortieForm
+
+
+def logout_view(request):
+	auth_logout(request)
+	return redirect('login')
 
 
 def is_admin(user):
