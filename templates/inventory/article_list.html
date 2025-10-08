@@ -1,7 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Articles</h1>
-<p><a href="/articles/nouveau/" class="btn">Nouvel article</a></p>
+<form method="get" style="margin-bottom:10px">
+	<input type="text" name="q" value="{{ q }}" placeholder="Rechercher (SN, description)...">
+	<select name="famille">
+		<option value="">Toutes les familles</option>
+		{% for f in familles %}
+			<option value="{{ f.id }}" {% if fam == f.id|stringformat:'s' %}selected{% endif %}>{{ f.libelle }}</option>
+		{% endfor %}
+	</select>
+	<select name="fabricant">
+		<option value="">Tous les fabricants</option>
+		{% for f in fabricants %}
+			<option value="{{ f.id }}" {% if fab == f.id|stringformat:'s' %}selected{% endif %}>{{ f.nom }}</option>
+		{% endfor %}
+	</select>
+	<select name="type">
+		<option value="">Tous les types</option>
+		{% for t in types %}
+			<option value="{{ t.id }}" {% if type_id == t.id|stringformat:'s' %}selected{% endif %}>{{ t.libelle }}</option>
+		{% endfor %}
+	</select>
+	<button type="submit">Filtrer</button>
+</form>
+<p>
+	<a href="/articles/nouveau/" class="btn">Nouvel article</a>
+	<a href="/articles/export.csv" class="btn">Exporter CSV</a>
+	<a href="/articles/importer/" class="btn">Importer CSV</a>
+</p>
 <table class="table">
 	<tr><th>Modèle</th><th>SN</th><th>Qté</th><th>Emplacement</th><th>Prix désiré</th></tr>
 	{% for a in articles %}

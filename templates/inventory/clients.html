@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Répertoire clients</h1>
+<p><a href="/repertoire/clients/export.csv" class="btn">Exporter CSV</a></p>
+<table class="table">
+	<tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Adresse</th></tr>
+	{% for c in clients %}
+	<tr>
+		<td>{{ c.nom }}</td>
+		<td>{{ c.email }}</td>
+		<td>{{ c.telephone }}</td>
+		<td>{{ c.adresse }}</td>
+	</tr>
+	{% empty %}
+	<tr><td colspan="4">Aucun client.</td></tr>
+	{% endfor %}
+</table>
+{% endblock %}

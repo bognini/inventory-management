@@ -1,23 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Mouvements</h1>
+<form method="get" style="margin-bottom:10px">
+	<input type="text" name="q" value="{{ q }}" placeholder="Rechercher...">
+	<input type="date" name="de" value="{{ de }}">
+	<input type="date" name="a" value="{{ a }}">
+	<select name="entrepot">
+		<option value="">Tous les entrepôts</option>
+		{% for e in entrepots %}
+			<option value="{{ e.id }}" {% if entepot_id == e.id|stringformat:'s' %}selected{% endif %}>{{ e.nom }}</option>
+		{% endfor %}
+	</select>
+	<button type="submit">Filtrer</button>
+</form>
 <p>
 	<a href="/mouvements/entree/" class="btn">Entrée</a>
 	<a href="/mouvements/sortie/" class="btn">Sortie</a>
+	<a href="/mouvements/export.csv" class="btn">Exporter CSV</a>
 </p>
 <table class="table">
-	<tr><th>Date</th><th>Type</th><th>Article</th><th>Qté</th><th>Destination</th><th>Projet</th></tr>
+	<tr><th>Date</th><th>Type</th><th>Article</th><th>Qté</th><th>Entrepôt</th><th>Client</th><th>Projet</th><th>Actions</th></tr>
 	{% for m in mouvements %}
 	<tr>
 		<td>{{ m.date_mouvement|date:'d/m/Y H:i' }}</td>
 		<td>{{ m.get_type_mouvement_display }}</td>
 		<td>{{ m.article }}</td>
 		<td>{{ m.quantite }}</td>
-		<td>{{ m.destination }}</td>
-		<td>{{ m.projet }}</td>
+		<td>{{ m.entrepot }}</td>
+		<td>{{ m.client }}</td>
+		<td>{{ m.projet_obj }}</td>
+		<td>
+			{% if m.type_mouvement == 'SORTIE' %}
+				<a class="btn" href="/mouvements/bon/{{ m.id }}/" target="_blank">Bon</a>
+				<a class="btn" href="/mouvements/bon/{{ m.id }}/pdf/">PDF</a>
+			{% endif %}
+		</td>
 	</tr>
 	{% empty %}
-	<tr><td colspan="6">Aucun mouvement.</td></tr>
+	<tr><td colspan="8">Aucun mouvement.</td></tr>
 	{% endfor %}
 </table>
 {% endblock %}

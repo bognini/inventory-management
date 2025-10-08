@@ -1,5 +1,5 @@
 from django import forms
-from .models import Article, MouvementStock
+from .models import Article, MouvementStock, Client, Projet, StockEntrepot, Entrepot
 
 class ArticleForm(forms.ModelForm):
 	serials_bulk = forms.CharField(label='Numéro(s) de série (un par ligne)', widget=forms.Textarea, required=False)
@@ -20,7 +20,7 @@ class ArticleForm(forms.ModelForm):
 class EntreeForm(forms.ModelForm):
 	class Meta:
 		model = MouvementStock
-		fields = ['article','quantite','commentaire']
+		fields = ['article','quantite','entrepot','commentaire']
 
 	def save(self, commit=True):
 		instance = super().save(commit=False)
@@ -30,19 +30,31 @@ class EntreeForm(forms.ModelForm):
 			article = instance.article
 			article.quantite += instance.quantite
 			article.save()
+			if instance.entrepot:
+				se, _ = StockEntrepot.objects.get_or_create(article=article, entrepot=instance.entrepot)
+				se.quantite += instance.quantite
+				se.save()
 		return instance
 
 class SortieForm(forms.ModelForm):
+	client = forms.ModelChoiceField(queryset=Client.objects.all(), required=False)
+	projet_obj = forms.ModelChoiceField(label='Projet', queryset=Projet.objects.all(), required=False)
+
 	class Meta:
 		model = MouvementStock
-		fields = ['article','quantite','destination','projet','commentaire']
+		fields = ['article','quantite','entrepot','client','projet_obj','destination','projet','commentaire']
 
 	def clean(self):
 		cleaned = super().clean()
 		article = cleaned.get('article')
 		quantite = cleaned.get('quantite') or 0
+		entrepot = cleaned.get('entrepot')
 		if article and quantite > article.quantite:
-			raise forms.ValidationError("Quantité demandée supérieure au stock disponible.")
+			raise forms.ValidationError("Quantité demandée supérieure au stock total disponible.")
+		if article and entrepot:
+			se = StockEntrepot.objects.filter(article=article, entrepot=entrepot).first()
+			if not se or quantite > se.quantite:
+				raise forms.ValidationError("Quantité demandée supérieure au stock de l'entrepôt sélectionné.")
 		return cleaned
 
 	def save(self, commit=True):
@@ -53,4 +65,8 @@ class SortieForm(forms.ModelForm):
 			article = instance.article
 			article.quantite -= instance.quantite
 			article.save()
+			if instance.entrepot:
+				se, _ = StockEntrepot.objects.get_or_create(article=article, entrepot=instance.entrepot)
+				se.quantite = max(0, se.quantite - instance.quantite)
+				se.save()
 		return instance

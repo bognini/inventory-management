@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Répertoire projets</h1>
+<p><a href="/repertoire/projets/export.csv" class="btn">Exporter CSV</a></p>
+<table class="table">
+	<tr><th>Titre</th><th>Client</th><th>Code</th><th>Actif</th></tr>
+	{% for p in projets %}
+	<tr>
+		<td>{{ p.titre }}</td>
+		<td>{{ p.client }}</td>
+		<td>{{ p.code }}</td>
+		<td>{{ p.actif|yesno:'Oui,Non' }}</td>
+	</tr>
+	{% empty %}
+	<tr><td colspan="4">Aucun projet.</td></tr>
+	{% endfor %}
+</table>
+{% endblock %}

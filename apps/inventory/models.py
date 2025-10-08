@@ -61,15 +61,57 @@ class Fournisseur(models.Model):
 		return self.nom
 
 
-class Emplacement(models.Model):
+class Entrepot(models.Model):
 	nom = models.CharField(max_length=100, unique=True)
+	adresse = models.TextField(blank=True)
 
 	class Meta:
+		verbose_name = 'Entrepôt'
+		verbose_name_plural = 'Entrepôts'
+
+	def __str__(self) -> str:
+		return self.nom
+
+
+class Emplacement(models.Model):
+	nom = models.CharField(max_length=100)
+	entrepot = models.ForeignKey(Entrepot, on_delete=models.CASCADE, related_name='emplacements')
+
+	class Meta:
+		unique_together = ('nom','entrepot')
 		verbose_name = 'Emplacement'
 		verbose_name_plural = 'Emplacements'
 
 	def __str__(self) -> str:
+		return f"{self.entrepot} / {self.nom}"
+
+
+class Client(models.Model):
+	nom = models.CharField(max_length=150, unique=True)
+	email = models.EmailField(blank=True)
+	telephone = models.CharField(max_length=50, blank=True)
+	adresse = models.TextField(blank=True)
+
+	class Meta:
+		verbose_name = 'Client'
+		verbose_name_plural = 'Clients'
+
+	def __str__(self) -> str:
 		return self.nom
+
+
+class Projet(models.Model):
+	titre = models.CharField(max_length=150)
+	client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='projets')
+	code = models.CharField(max_length=50, blank=True)
+	actif = models.BooleanField(default=True)
+
+	class Meta:
+		verbose_name = 'Projet'
+		verbose_name_plural = 'Projets'
+
+	def __str__(self) -> str:
+		return f"{self.titre} ({self.client})"
 
 
 class Article(models.Model):
@@ -102,6 +144,20 @@ class Article(models.Model):
 		return (self.prix_achat or 0) + (self.cout_logistique or 0)
 
 
+class StockEntrepot(models.Model):
+	article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='stocks')
+	entrepot = models.ForeignKey(Entrepot, on_delete=models.CASCADE, related_name='stocks')
+	quantite = models.PositiveIntegerField(default=0)
+
+	class Meta:
+		unique_together = ('article','entrepot')
+		verbose_name = 'Stock entrepôt'
+		verbose_name_plural = 'Stocks entrepôt'
+
+	def __str__(self) -> str:
+		return f"{self.entrepot} - {self.article} : {self.quantite}"
+
+
 class MouvementStock(models.Model):
 	ENTREE = 'ENTREE'
 	SORTIE = 'SORTIE'
@@ -113,8 +169,11 @@ class MouvementStock(models.Model):
 	article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='mouvements')
 	type_mouvement = models.CharField(max_length=10, choices=TYPE_CHOIX)
 	quantite = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+	entrepot = models.ForeignKey(Entrepot, on_delete=models.PROTECT, null=True, blank=True)
 	destination = models.CharField(max_length=255, blank=True)
 	projet = models.CharField(max_length=255, blank=True)
+	client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True)
+	projet_obj = models.ForeignKey(Projet, on_delete=models.SET_NULL, null=True, blank=True)
 	commentaire = models.TextField(blank=True)
 	date_mouvement = models.DateTimeField(auto_now_add=True)
 

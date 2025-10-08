@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Importer des articles (CSV)</h1>
+<p>En-têtes requis: <code>famille,type,fabricant,modele,numero_serie,description,prix_achat,cout_logistique,prix_desire,emplacement,fournisseur,quantite</code></p>
+<form method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<input type="file" name="fichier" accept=".csv" required>
+	<button type="submit">Importer</button>
+</form>
+{% endblock %}

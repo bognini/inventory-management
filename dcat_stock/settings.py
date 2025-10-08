@@ -49,12 +49,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'dcat_stock.wsgi.application'
 ASGI_APPLICATION = 'dcat_stock.asgi.application'
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': BASE_DIR / 'db.sqlite3',
+DB_ENGINE = os.getenv('DJANGO_DB_ENGINE', 'sqlite')
+if DB_ENGINE == 'postgres':
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.postgresql',
+			'NAME': os.getenv('DJANGO_DB_NAME', 'dcat'),
+			'USER': os.getenv('DJANGO_DB_USER', 'dcat'),
+			'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', ''),
+			'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
+			'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+		}
 	}
-}
+else:
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.sqlite3',
+			'NAME': BASE_DIR / 'db.sqlite3',
+		}
+	}
 
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Africa/Douala'

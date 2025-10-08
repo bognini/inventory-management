@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<title>Bon de sortie</title>
+	<link rel="stylesheet" href="/static/css/style.css">
+	<style>
+		.print-area{max-width:800px;margin:20px auto;background:#fff;padding:20px;border:1px solid #e5e7eb}
+		.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+		.small{color:#555}
+		@media print {.btn{display:none}}
+	</style>
+</head>
+<body>
+	<div class="print-area">
+		<div class="header">
+			<h1>Bon de sortie</h1>
+			<div class="small">Date: {{ m.date_mouvement|date:'d/m/Y H:i' }}</div>
+		</div>
+		<p><strong>Client:</strong> {{ m.client|default:'—' }}<br>
+		<strong>Projet:</strong> {{ m.projet_obj|default:'—' }} {{ m.projet }}</p>
+		<table class="table">
+			<tr><th>Article</th><th>Numéro de série</th><th>Quantité</th><th>Prix désiré</th></tr>
+			<tr>
+				<td>{{ m.article.modele }}</td>
+				<td>{{ m.article.numero_serie }}</td>
+				<td>{{ m.quantite }}</td>
+				<td>{{ m.article.prix_desire }} FCFA</td>
+			</tr>
+		</table>
+		<p><strong>Destination:</strong> {{ m.destination }}</p>
+		<p><strong>Commentaire:</strong> {{ m.commentaire }}</p>
+		<p style="margin-top:40px">Signature: __________________________</p>
+		<p><button class="btn" onclick="window.print()">Imprimer</button></p>
+	</div>
+</body>
+</html>

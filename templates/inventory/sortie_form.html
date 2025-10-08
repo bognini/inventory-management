@@ -4,6 +4,7 @@
 <form method="post">
 	{% csrf_token %}
 	{{ form.as_p }}
+	<p>Vous pouvez renseigner un <strong>Client</strong> et un <strong>Projet</strong> (optionnels). Un bon de sortie imprimable sera proposé après enregistrement.</p>
 	<button type="submit">Valider la sortie</button>
 </form>
 {% endblock %}
