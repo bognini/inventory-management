@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Nouvel article</h1>
+<form method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<p>Ou coller plusieurs numéros de série (un par ligne) dans le champ ci-dessus.</p>
+	<button type="submit">Enregistrer</button>
+</form>
+{% endblock %}
